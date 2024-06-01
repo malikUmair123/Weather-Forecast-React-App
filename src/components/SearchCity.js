@@ -1,6 +1,8 @@
 // src/components/SearchCity.js
 import React, { useState } from 'react';
 import axios from 'axios';
+import './SearchCity.css'; // Ensure you have the corresponding CSS file
+
 
 const USERNAME = process.env.REACT_APP_GEONAMES_API_USERNAME;
 const BASE_URL = 'http://api.geonames.org';
@@ -22,20 +24,21 @@ const SearchCity = ({ onCitySelect }) => {
     };
 
     return (
-        <div>
+        <div className="search-city">
             <input
                 type="text"
                 placeholder="Search for a city"
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
             />
-            <ul>
+            <div className="suggestions-list">
                 {suggestions.map((city) => (
-                    <li key={city} onClick={() => onCitySelect(city)}>
+                    <div key={city} className="suggestion-item" onClick={() => onCitySelect(city)}>
                         {city}
-                    </li>
+                    </div>
                 ))}
-            </ul>
+            </div>
+            
         </div>
     );
 };

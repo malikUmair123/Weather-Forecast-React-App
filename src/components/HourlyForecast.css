@@ -1,0 +1,17 @@
+.hourly-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+}
+
+.condition-text-hour {
+    flex: 1;
+    text-align: center;
+}
+
+.weather-icon {
+    width: 40px;
+    height: 40px;
+}

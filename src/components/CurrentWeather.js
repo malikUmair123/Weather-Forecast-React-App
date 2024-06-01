@@ -1,16 +1,25 @@
-// src/components/CurrentWeather.js
 import React, { useState, useEffect } from 'react';
 import { getCurrentWeather } from '../services/weatherService';
 import { FaSearch } from 'react-icons/fa'; // Importing search icon
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import './CurrentWeather.css';
+import { format } from 'date-fns';
+
 
 const CurrentWeather = ({ location, unit, onCitySelect }) => {
     const [weather, setWeather] = useState(null);
+    const [error, setError] = useState(null); // Define error state
 
     useEffect(() => {
         if (location) {
-            getCurrentWeather(location).then(setWeather);
+            setError(null); // Reset error state before making a new request
+            getCurrentWeather(location)
+                .then(setWeather)
+                .catch(error => error.response && error.response.status === 400 ?
+                    setError("Location not found. Please try another location.") :
+                    setError("Oops! Something went wrong. Please try again later.")
+                );
         }
     }, [location]);
 
@@ -23,7 +32,11 @@ const CurrentWeather = ({ location, unit, onCitySelect }) => {
                     const city = response.data.city;
                     onCitySelect(city);
                 } catch (error) {
-                    console.error('Error fetching current location:', error);
+                    if (error.response && error.response.status === 400) {
+                        setError("Location not found. Please try another location.");
+                    } else {
+                        setError("Oops! Something went wrong. Please try again later.");
+                    }
                 }
             }, (error) => {
                 console.error('Error getting current location:', error);
@@ -33,6 +46,20 @@ const CurrentWeather = ({ location, unit, onCitySelect }) => {
         }
     };
 
+    if (error) {
+        return (
+            <div className="current-weather">
+                <p>{error}</p>
+                <div className="actions">
+                    <Link to="/search" className="search-icon">
+                        <FaSearch />
+                    </Link>
+                    <button onClick={handleUseCurrentLocation}>Use Current Location</button>
+                </div>
+            </div>
+        );
+    }
+
     if (!weather) return <p>Loading...</p>;
 
     const temp = unit === 'C' ? weather.current.temp_c : weather.current.temp_f;
@@ -41,14 +68,17 @@ const CurrentWeather = ({ location, unit, onCitySelect }) => {
 
     return (
         <div className="current-weather">
-            <Link to="/search" className="search-icon">
-                <FaSearch />
-            </Link>
-            <button onClick={handleUseCurrentLocation}>Use Current Location</button>
+            <div className="actions">
+                <Link to="/search" className="search-icon">
+                    <FaSearch />
+                </Link>
+                <button onClick={handleUseCurrentLocation}>Use Current Location</button>
+            </div>
             <div className="header">
                 <p className="temperature">{temp}&#176;{unit}</p>
                 <h2>{weather.location.name}</h2>
-                <p>{weather.location.localtime}</p>
+                <p>{format(new Date(weather.location.localtime), 'MMMM d, p')}</p>
+
             </div>
             <div className="icon">
                 <img className="weather-icon" src={weather.current.condition.icon} alt={weather.current.condition.text} />
@@ -64,4 +94,3 @@ const CurrentWeather = ({ location, unit, onCitySelect }) => {
 };
 
 export default CurrentWeather;
-
