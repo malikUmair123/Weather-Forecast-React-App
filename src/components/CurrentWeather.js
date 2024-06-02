@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { getCurrentWeather } from '../services/weatherService';
 import { FaSearch } from 'react-icons/fa'; // Importing search icon
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+//import axios from 'axios';
 import './CurrentWeather.css';
 import { format } from 'date-fns';
+import ErrorMessages from '../constants/errorMessages';
 
 
 const CurrentWeather = ({ location, unit, onCitySelect }) => {
@@ -17,8 +18,8 @@ const CurrentWeather = ({ location, unit, onCitySelect }) => {
             getCurrentWeather(location)
                 .then(setWeather)
                 .catch(error => error.response && error.response.status === 400 ?
-                    setError("Location not found. Please try another location.") :
-                    setError("Oops! Something went wrong. Please try again later.")
+                    setError(ErrorMessages.LOCATION_NOT_FOUND) :
+                    setError(ErrorMessages.GENERIC_ERROR)
                 );
         }
     }, [location]);
@@ -28,23 +29,24 @@ const CurrentWeather = ({ location, unit, onCitySelect }) => {
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const { latitude, longitude } = position.coords;
                 try {
-                    const response = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
-                    const city = response.data.city;
-                    onCitySelect(city);
+                    const response = await getCurrentWeather(`${latitude},${longitude}`);
+                    setWeather(response);
+                    onCitySelect(response.location.name);
                 } catch (error) {
                     if (error.response && error.response.status === 400) {
-                        setError("Location not found. Please try another location.");
+                        setError(ErrorMessages.LOCATION_NOT_FOUND);
                     } else {
-                        setError("Oops! Something went wrong. Please try again later.");
+                        setError(ErrorMessages.GENERIC_ERROR);
                     }
                 }
             }, (error) => {
-                console.error('Error getting current location:', error);
+                console.error(ErrorMessages.ERROR_LOCATION, error);
             });
         } else {
-            console.error('Geolocation is not supported by this browser.');
+            console.error(ErrorMessages.NO_GEOLOCATION_BROWSER_SUPPORT);
         }
     };
+
 
     if (error) {
         return (

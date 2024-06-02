@@ -45,6 +45,7 @@ nav a {
     .sidebar {
         display: block; /* Show the sidebar on larger screens */
         flex: 1; /* Take up equal space as main content */
+        overflow-y: auto; /* Allow scrolling in the sidebar on larger screens */
     }
 }
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getFiveDayForecast } from '../services/weatherService';
 import { format } from 'date-fns';
 import './FiveDayForecast.css'; // Import the CSS file for styling
+import ErrorMessages from '../constants/errorMessages';
 
 const FiveDayForecast = ({ location, unit }) => {
     const [forecast, setForecast] = useState([]);
@@ -13,18 +14,14 @@ const FiveDayForecast = ({ location, unit }) => {
             getFiveDayForecast(location)
                 .then(setForecast)
                 .catch(error => error.response && error.response.status === 400 ?
-                    setError("Location not found. Please try another location.") :
-                    setError("Oops! Something went wrong. Please try again later.")
+                    setError(ErrorMessages.LOCATION_NOT_FOUND) :
+                    setError(ErrorMessages.GENERIC_ERROR)
                 );
         }
     }, [location]);
 
     if (error) {
-        return (
-            <div>
-                <p>{error}</p>
-            </div>
-        );
+        return;
     }
 
     return (

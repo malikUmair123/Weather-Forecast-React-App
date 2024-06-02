@@ -5,7 +5,7 @@ import './SearchCity.css'; // Ensure you have the corresponding CSS file
 
 
 const USERNAME = process.env.REACT_APP_GEONAMES_API_USERNAME;
-const BASE_URL = 'http://api.geonames.org';
+const BASE_URL = 'http://secure.geonames.org';
 
 const SearchCity = ({ onCitySelect }) => {
     const [searchQuery, setSearchQuery] = useState('');
